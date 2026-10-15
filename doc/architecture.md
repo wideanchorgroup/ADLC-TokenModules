@@ -73,7 +73,7 @@ flowchart TD
     API --> LEDGER
     LEDGER --> DASH
     DASH -->|12. Set Budget / Kill Switch| API
-    API -->|13. Broadcast Signed Kill List (~10s)| HALOS
+    API -->|"13. Broadcast Signed Kill List (~10s)"| HALOS
     HALOS -->|14. Fast Drop Quota| GW
 ```
 
