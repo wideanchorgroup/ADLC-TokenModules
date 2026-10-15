@@ -27,9 +27,9 @@
 ```
 Enterprise AI Developer Platform
 │
-├── Compass: How coding agents work (guardrails, budget caps, review loops)
-├── Distil:  How context is managed and measured (compression, receipts, audits)
-└── Halos:   How approved tooling/configuration reaches developers (signed releases, rings)
+├── ADLC 1: How coding agents work (guardrails, budget caps, review loops)
+├── ADLC 2:  How context is managed and measured (compression, receipts, audits)
+└── ADLC 3:   How approved tooling/configuration reaches developers (signed releases, rings)
 ```
 
 Instead of reinventing guardrail engines, token compressors, or fleet rollout machinery, this platform provides the **authoritative enterprise management layer**:
