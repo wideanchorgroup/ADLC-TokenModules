@@ -20,9 +20,9 @@
 
 **ADLC-TokenModules** is an enterprise developer platform and FinOps control plane built on top of three specialized AI coding technologies:
 
-1. **[Compass](https://github.com/dshakes/compass)**: Coding-agent configuration, command guardrails (scored 100/100 in CI), hard budget enforcement (`COMPASS_MAX_USD`), review/test/fix loops, and human merge gates.
-2. **[Distil](https://github.com/dshakes/distil)**: Context compression, recovery, cost measurement (`distil savings`), and context auditing (`distil audit`).
-3. **[Halos](https://github.com/dshakes/halos)**: Open-source control plane for AI coding CLIs (Claude Code, Codex, Gemini CLI), signed configuration releases, fleet rollout rings (Dark launch → 1% → 5% → 25% → 100% GA), eval-gated promotion, and emergency kill switches.
+1. Coding-agent configuration, command guardrails (scored 100/100 in CI), hard budget enforcement (`COMPASS_MAX_USD`), review/test/fix loops, and human merge gates.
+2. Context compression, recovery, cost measurement (`distil savings`), and context auditing (`distil audit`).
+3. Open-source control plane for AI coding CLIs (Claude Code, Codex, Gemini CLI), signed configuration releases, fleet rollout rings (Dark launch → 1% → 5% → 25% → 100% GA), eval-gated promotion, and emergency kill switches.
 
 ```
 Enterprise AI Developer Platform
