@@ -1,0 +1,14 @@
+# Python virtualenv & caches
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+*.sqlite3
+*.db
+.DS_Store

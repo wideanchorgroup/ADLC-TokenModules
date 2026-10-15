@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADLC FinOps & Governance Control Plane</title>
+    <meta name="description" content="Enterprise FinOps Control Plane consuming Compass, Distil, and Halos APIs for governed AI-assisted SDLC">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body class="dark-theme">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <span class="logo-icon">🧭</span>
+                    <span class="logo-pulse"></span>
+                </div>
+                <div class="brand-text">
+                    <h1>ADLC FinOps</h1>
+                    <span class="badge badge-brand">Compass • Distil • Halos</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section-title">CONTROL PLANE</div>
+                <button class="nav-item active" data-tab="tab-finops" id="nav-finops">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-label">FinOps & Controls</span>
+                    <span class="badge badge-pill badge-live" id="budget-util-badge">--%</span>
+                </button>
+                <button class="nav-item" data-tab="tab-evidence" id="nav-evidence">
+                    <span class="nav-icon">📜</span>
+                    <span class="nav-label">Unified Evidence</span>
+                </button>
+                <button class="nav-item" data-tab="tab-golden-tasks" id="nav-golden-tasks">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-label">Golden-Path Tasks</span>
+                </button>
+
+                <div class="nav-section-title">GOVERNANCE & SAFETY</div>
+                <button class="nav-item" data-tab="tab-onboarding" id="nav-onboarding">
+                    <span class="nav-icon">🚀</span>
+                    <span class="nav-label">Self-Service Intake</span>
+                </button>
+                <button class="nav-item" data-tab="tab-policies" id="nav-policies">
+                    <span class="nav-icon">🛡️</span>
+                    <span class="nav-label">Policy Profiles</span>
+                </button>
+                <button class="nav-item" data-tab="tab-qualification" id="nav-qualification">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">Repo Qualification</span>
+                </button>
+                <button class="nav-item" data-tab="tab-plugins" id="nav-plugins">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-label">Governed Plugins</span>
+                </button>
+
+                <div class="nav-section-title">FLEET & OPERATIONS</div>
+                <button class="nav-item" data-tab="tab-fleet" id="nav-fleet">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-label">Fleet Posture & Drift</span>
+                </button>
+                <button class="nav-item" data-tab="tab-evals" id="nav-evals">
+                    <span class="nav-icon">🧪</span>
+                    <span class="nav-label">Enterprise Evals</span>
+                </button>
+                <button class="nav-item" data-tab="tab-feedback" id="nav-feedback">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-label">SDLC Feedback Loop</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="kill-switch-card">
+                    <div class="kill-switch-header">
+                        <span class="ks-icon">🚨</span>
+                        <div class="ks-info">
+                            <strong>Fleet Kill Switch</strong>
+                            <span class="ks-status" id="sidebar-ks-status">OFFLINE (Normal)</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-danger-outline" id="btn-quick-kill">Emergency Halt</button>
+                </div>
+                <div class="system-status">
+                    <span class="status-dot healthy"></span>
+                    <span>APIs Connected: Compass, Distil, Halos</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-viewport">
+            <!-- Top App Bar -->
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb-root">Enterprise Platform</span>
+                    <span class="crumb-separator">/</span>
+                    <span class="crumb-current" id="current-view-title">FinOps & Spend Controls</span>
+                </div>
+                <div class="top-actions">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="global-search" placeholder="Search repo, task ID, developer, or policy...">
+                    </div>
+                    <div class="gateway-indicator">
+                        <span class="dot-pulse"></span>
+                        <span>Gateway: Active</span>
+                    </div>
+                    <button class="btn btn-secondary btn-icon" id="btn-refresh" title="Refresh Live State">🔄</button>
+                    <a href="/docs" target="_blank" class="btn btn-secondary" id="btn-api-docs">API Docs ↗</a>
+                </div>
+            </header>
+
+            <!-- Tab 1: FinOps & Spend Controls -->
+            <section class="tab-panel active" id="tab-finops">
+                <div class="panel-header">
+                    <div>
+                        <h2>Developer AI FinOps Dashboard</h2>
+                        <p class="subtitle">Unit economics, cost per accepted change, failed task costs, and Distil context ROI.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="btn-open-budget-modal">⚙️ Set Budget Ceilings</button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Grid -->
+                <div class="metric-grid">
+                    <div class="metric-card card-glow">
+                        <div class="metric-icon-wrap bg-purple">💵</div>
+                        <div class="metric-details">
+                            <span class="metric-label">Total Net Spend</span>
+                            <h3 class="metric-value" id="kpi-total-spend">$0.00</h3>
+                            <span class="metric-subtext">Monthly Cap: <strong id="kpi-monthly-cap">$50,000.00</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card card-glow">
+                        <div class="metric-icon-wrap bg-emerald">✅</div>
+                        <div class="metric-details">
+                            <span class="metric-label">Cost / Accepted PR</span>
+                            <h3 class="metric-value text-emerald" id="kpi-cost-accepted">$0.00</h3>
+                            <span class="metric-subtext"><span id="kpi-accepted-count">0</span> accepted changes</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card card-glow">
+                        <div class="metric-icon-wrap bg-rose">⚠️</div>
+                        <div class="metric-details">
+                            <span class="metric-label">Wasted Spend (Failed/Halted)</span>
+                            <h3 class="metric-value text-rose" id="kpi-wasted-spend">$0.00</h3>
+                            <span class="metric-subtext"><span id="kpi-wasted-pct">0%</span> of gross spend</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card card-glow">
+                        <div class="metric-icon-wrap bg-cyan">⚡</div>
+                        <div class="metric-details">
+                            <span class="metric-label">Distil Compression Savings</span>
+                            <h3 class="metric-value text-cyan" id="kpi-distil-savings">$0.00</h3>
+                            <span class="metric-subtext">ROI: <strong id="kpi-distil-roi">10.8x</strong> net return</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary FinOps Views -->
+                <div class="grid-two-columns">
+                    <!-- Spend by Repo -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Spend Breakdown by Repository</h3>
+                            <span class="card-badge">Compass + Distil Receipts</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="table-repo-spend">
+                                    <thead>
+                                        <tr>
+                                            <th>Repository</th>
+                                            <th>Net Spend</th>
+                                            <th>Accepted</th>
+                                            <th>Failed</th>
+                                            <th>Wasted</th>
+                                            <th>Avg / Task</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-repo-spend">
+                                        <tr><td colspan="6" class="loading-cell">Loading ledger...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spend by Foundation Model -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Spend Breakdown by Model Route</h3>
+                            <span class="card-badge">Halos Routing</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table" id="table-model-spend">
+                                    <thead>
+                                        <tr>
+                                            <th>Model Candidate</th>
+                                            <th>Net Spend</th>
+                                            <th>Tasks</th>
+                                            <th>Success Rate</th>
+                                            <th>Avg / Task</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-model-spend">
+                                        <tr><td colspan="5" class="loading-cell">Loading model costs...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Self-Service Onboarding -->
+            <section class="tab-panel" id="tab-onboarding">
+                <div class="panel-header">
+                    <div>
+                        <h2>Self-Service "AI-Ready Repository" Onboarding</h2>
+                        <p class="subtitle">Enroll developer + repository with access, budget, Halos signed tooling, and Compass bounded verification.</p>
+                    </div>
+                </div>
+
+                <div class="grid-form-and-list">
+                    <!-- Onboarding Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Enroll Developer & Repository</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-onboarding">
+                                <div class="form-group">
+                                    <label for="onb-dev-id">Developer Identity / SSO ID</label>
+                                    <input type="text" id="onb-dev-id" required placeholder="e.g. dev_jane_doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="onb-repo">Repository Full Name</label>
+                                    <input type="text" id="onb-repo" required placeholder="wideanchorgroup/payments-v2">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="onb-env">Environment Type</label>
+                                        <select id="onb-env">
+                                            <option value="local_workstation">Local Workstation</option>
+                                            <option value="dev_container">Dev Container</option>
+                                            <option value="ci_runner">CI Runner</option>
+                                            <option value="managed_vm">Managed VM</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="onb-data-class">Data Classification</label>
+                                        <select id="onb-data-class">
+                                            <option value="internal" selected>Internal</option>
+                                            <option value="confidential">Confidential</option>
+                                            <option value="restricted">Restricted</option>
+                                            <option value="public">Public</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="onb-budget">Monthly Budget Cap ($ USD)</label>
+                                        <input type="number" id="onb-budget" value="750.00" min="10" step="10">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="onb-ring">Rollout Ring (Halos)</label>
+                                        <select id="onb-ring">
+                                            <option value="canary_5" selected>Canary 5%</option>
+                                            <option value="canary_1">Canary 1%</option>
+                                            <option value="stage_25">Stage 25%</option>
+                                            <option value="ga_100">GA 100%</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-submit-onboard">
+                                    Run Intake & Bounded Verification Task
+                                </button>
+                            </form>
+                            <div class="verification-live-box" id="onboarding-live-feedback" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Enrolled List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Active Enrolled Entities</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Developer</th>
+                                            <th>Repository</th>
+                                            <th>Environment</th>
+                                            <th>Classification</th>
+                                            <th>Budget Cap</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-onboarded-list">
+                                        <tr><td colspan="6" class="loading-cell">Loading enrollments...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Enterprise Policy Profiles -->
+            <section class="tab-panel" id="tab-policies">
+                <div class="panel-header">
+                    <div>
+                        <h2>Enterprise Policy Profiles</h2>
+                        <p class="subtitle">Approved configurations by repository sensitivity, development environment, and task risk.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Signed Policy Bundles</h3>
+                        <span class="card-badge">Halos Signed Releases</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Profile Name</th>
+                                        <th>Sensitivity</th>
+                                        <th>Environment</th>
+                                        <th>Task Risk</th>
+                                        <th>Compass Max USD</th>
+                                        <th>Distil Mode</th>
+                                        <th>Halos Ring</th>
+                                        <th>Specialist Review</th>
+                                        <th>Signature</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-policy-profiles">
+                                    <tr><td colspan="9" class="loading-cell">Loading profiles...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: Repository Qualification -->
+            <section class="tab-panel" id="tab-qualification">
+                <div class="panel-header">
+                    <div>
+                        <h2>Repository Qualification & Readiness Assessment</h2>
+                        <p class="subtitle">Actionable scorecard identifying missing tests, branch protection, unapproved MCP tools, and billing ownership.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="btn-run-assessment">🔍 Evaluate New Repository</button>
+                    </div>
+                </div>
+
+                <div class="scorecard-grid" id="qualification-cards-container">
+                    <!-- Cards populated via JavaScript -->
+                </div>
+            </section>
+
+            <!-- Tab 5: Golden-Path Task Catalog -->
+            <section class="tab-panel" id="tab-golden-tasks">
+                <div class="panel-header">
+                    <div>
+                        <h2>Golden-Path Task Catalog</h2>
+                        <p class="subtitle">Repeatable workflows for bug fixes, test generation, dependency updates, documentation, and approved refactoring.</p>
+                    </div>
+                </div>
+
+                <div class="grid-two-columns">
+                    <!-- Task Catalog -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Approved Task Templates</h3>
+                            <span class="card-badge">Compass Review/Test/Fix Loops</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="catalog-list" id="golden-catalog-items">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Launcher & Execution Console -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Launch Governed Task</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-launch-task">
+                                <div class="form-group">
+                                    <label for="launch-template-select">Select Task Template</label>
+                                    <select id="launch-template-select" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="launch-repo">Repository</label>
+                                    <input type="text" id="launch-repo" value="wideanchorgroup/ADLC-TokenModules" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="launch-work-item">Work Item / Issue Reference</label>
+                                    <input type="text" id="launch-work-item" value="JIRA-5120" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="launch-prompt">Task Objective & Prompt</label>
+                                    <textarea id="launch-prompt" rows="3" required placeholder="Describe task goal. Compass will execute review/test/fix loop and halt at budget ceiling."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-execute-task">Execute Bounded Task</button>
+                            </form>
+                            <div class="task-output-terminal" id="task-live-output" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 6: Unified Task Evidence Record -->
+            <section class="tab-panel" id="tab-evidence">
+                <div class="panel-header">
+                    <div>
+                        <h2>Unified Task Evidence Records</h2>
+                        <p class="subtitle">Complete audit record linking work item, commit, agent identity, Compass policy, Halos release, Distil receipts, cost, and human merge.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Auditable Engineering Evidence Ledger</h3>
+                        <span class="card-badge">Zero Secrets Centralized</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Work Item</th>
+                                        <th>Repository</th>
+                                        <th>Commit</th>
+                                        <th>Agent / Model</th>
+                                        <th>Halos Release</th>
+                                        <th>Cost</th>
+                                        <th>Distil Saved</th>
+                                        <th>PR #</th>
+                                        <th>Approver</th>
+                                        <th>Outcome</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-evidence-records">
+                                    <tr><td colspan="10" class="loading-cell">Loading evidence records...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 7: Enterprise Evaluation & Experiment Service -->
+            <section class="tab-panel" id="tab-evals">
+                <div class="panel-header">
+                    <div>
+                        <h2>Enterprise Evaluation & Experiment Service</h2>
+                        <p class="subtitle">Compare approved tool/model/config combinations on representative internal tasks before rollout.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="btn-open-eval-modal">🧪 Run New Experiment</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Model & Tool Comparison Scorecards</h3>
+                        <span class="card-badge">Halos Evals + Distil Shadow Testing</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Experiment Name</th>
+                                        <th>Stack / Combination</th>
+                                        <th>Model Candidate</th>
+                                        <th>Pass@k</th>
+                                        <th>Cost / Solved Task</th>
+                                        <th>Avg Duration</th>
+                                        <th>Security Regressions</th>
+                                        <th>Verdict</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-evaluations">
+                                    <tr><td colspan="8" class="loading-cell">Loading evaluations...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 8: Governed Plugin / MCP Catalog -->
+            <section class="tab-panel" id="tab-plugins">
+                <div class="panel-header">
+                    <div>
+                        <h2>Governed Plugin & MCP Catalog</h2>
+                        <p class="subtitle">Approved tools with owners, versions, permissions, data destinations, and retirement policies.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="btn-open-plugin-modal">➕ Register Plugin</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Plugin & MCP Security Registry</h3>
+                        <span class="card-badge">Compass Plugin Scanner Scored</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tool Name</th>
+                                        <th>Version</th>
+                                        <th>Owner</th>
+                                        <th>Permissions</th>
+                                        <th>Data Destinations</th>
+                                        <th>Scan Score</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-plugins">
+                                    <tr><td colspan="8" class="loading-cell">Loading plugin registry...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 9: Fleet Posture & Drift Dashboard -->
+            <section class="tab-panel" id="tab-fleet">
+                <div class="panel-header">
+                    <div>
+                        <h2>Fleet Posture and Drift Dashboard</h2>
+                        <p class="subtitle">Identify outdated clients, configuration drift, unsupported combinations, and overdue exceptions.</p>
+                    </div>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Total Fleet Nodes</span>
+                        <h3 class="metric-value" id="fleet-total-nodes">0</h3>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Healthy & Pinned</span>
+                        <h3 class="metric-value text-emerald" id="fleet-healthy-nodes">0</h3>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Drift Detected</span>
+                        <h3 class="metric-value text-rose" id="fleet-drift-nodes">0</h3>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Fleet Compliance</span>
+                        <h3 class="metric-value text-cyan" id="fleet-compliance-pct">100%</h3>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Coding Agent Nodes</h3>
+                        <span class="card-badge">Halos Rollout Rings & Compass Checks</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Node ID</th>
+                                        <th>Developer</th>
+                                        <th>CLI Client</th>
+                                        <th>Installed</th>
+                                        <th>Pinned</th>
+                                        <th>Assigned Ring</th>
+                                        <th>Status</th>
+                                        <th>Remediation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-fleet-nodes">
+                                    <tr><td colspan="8" class="loading-cell">Loading fleet nodes...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 10: SDLC Feedback Loop -->
+            <section class="tab-panel" id="tab-feedback">
+                <div class="panel-header">
+                    <div>
+                        <h2>SDLC Feedback and Improvement Loop</h2>
+                        <p class="subtitle">Convert recurring failures and developer corrections into reviewed configuration or workflow improvements.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Clustered Failure Patterns & Automated Policy Fixes</h3>
+                        <span class="card-badge">Halos Controlled Rollout</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Failure Pattern</th>
+                                        <th>Occurrences</th>
+                                        <th>Affected Repositories</th>
+                                        <th>Suggested Improvement</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-feedback-patterns">
+                                    <tr><td colspan="6" class="loading-cell">Loading feedback patterns...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Budget Cap Modal -->
+    <div class="modal-backdrop" id="modal-budget" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Update Enterprise Budget Ceilings</h3>
+                <button class="modal-close" data-close="modal-budget">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-update-budget">
+                    <div class="form-group">
+                        <label for="budget-scope">Scope</label>
+                        <select id="budget-scope">
+                            <option value="global">Global Enterprise Fleet</option>
+                            <option value="wideanchorgroup/ADLC-TokenModules">wideanchorgroup/ADLC-TokenModules</option>
+                            <option value="wideanchorgroup/auth-service">wideanchorgroup/auth-service</option>
+                            <option value="wideanchorgroup/legacy-billing">wideanchorgroup/legacy-billing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget-new-cap">Monthly Hard Budget Cap ($ USD)</label>
+                        <input type="number" id="budget-new-cap" value="50000.00" step="500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget-threshold">Alert Threshold (% of Cap)</label>
+                        <input type="number" id="budget-threshold" value="80" min="50" max="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Apply & Sync with Compass/Halos</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kill Switch Modal -->
+    <div class="modal-backdrop" id="modal-kill" style="display:none;">
+        <div class="modal-box modal-danger">
+            <div class="modal-header">
+                <h3>🚨 Emergency Fleet Kill Switch</h3>
+                <button class="modal-close" data-close="modal-kill">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Broadcasting a signed kill list will immediately stop all AI coding tool completions across all gateways within ~10 seconds.</p>
+                <form id="form-kill-switch">
+                    <div class="form-group">
+                        <label for="ks-action-select">Action</label>
+                        <select id="ks-action-select">
+                            <option value="true">ACTIVATE KILL SWITCH (Halt All Traffic)</option>
+                            <option value="false">DEACTIVATE KILL SWITCH (Resume Operations)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ks-reason">Reason / Incident Reference</label>
+                        <input type="text" id="ks-reason" required placeholder="e.g. Unusual token surge or runaway loop detected">
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block">Broadcast Signed Kill Switch</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Repo Assessment Modal -->
+    <div class="modal-backdrop" id="modal-assessment" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Evaluate Repository Qualification</h3>
+                <button class="modal-close" data-close="modal-assessment">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-eval-repo">
+                    <div class="form-group">
+                        <label for="eval-repo-name">Repository Full Name</label>
+                        <input type="text" id="eval-repo-name" required placeholder="org/repo-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="eval-owner">Billing & Tech Owner</label>
+                        <input type="text" id="eval-owner" required placeholder="e.g. billing-core-team">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Run Qualification Checks</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plugin Registration Modal -->
+    <div class="modal-backdrop" id="modal-plugin" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Register Governed Tool / MCP Plugin</h3>
+                <button class="modal-close" data-close="modal-plugin">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-register-plugin">
+                    <div class="form-group">
+                        <label for="reg-plg-name">Plugin / MCP Name</label>
+                        <input type="text" id="reg-plg-name" required placeholder="e.g. Sentry Error Inspector">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-plg-version">Version</label>
+                        <input type="text" id="reg-plg-version" value="1.0.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-plg-owner">Owner Team</label>
+                        <input type="text" id="reg-plg-owner" required placeholder="sre-platform">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-plg-perms">Permissions (comma separated)</label>
+                        <input type="text" id="reg-plg-perms" value="http_read, log_view" placeholder="git_read, fs_write">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-plg-dests">Data Destinations (comma separated)</label>
+                        <input type="text" id="reg-plg-dests" value="sentry.io" placeholder="api.github.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Scan with Compass & Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experiment Modal -->
+    <div class="modal-backdrop" id="modal-experiment" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Launch Enterprise Evaluation Experiment</h3>
+                <button class="modal-close" data-close="modal-experiment">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-run-experiment">
+                    <div class="form-group">
+                        <label for="exp-name">Experiment Name</label>
+                        <input type="text" id="exp-name" required value="Claude 3.7 vs Gemini 2.5 on Refactoring">
+                    </div>
+                    <div class="form-group">
+                        <label for="exp-model">Model Candidate</label>
+                        <input type="text" id="exp-model" required value="anthropic/claude-3-7-sonnet">
+                    </div>
+                    <div class="form-group">
+                        <label for="exp-stack">Tool Combination</label>
+                        <input type="text" id="exp-stack" value="Compass + Distil(lossless) + Halos Canary">
+                    </div>
+                    <div class="form-group">
+                        <label for="exp-samples">Representative Tasks Sample Size</label>
+                        <input type="number" id="exp-samples" value="10" min="2" max="50">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Run Evaluation Matrix</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
